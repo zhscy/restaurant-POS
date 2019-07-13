@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.order.mapper.ItemMapper">
+
+
+    <resultMap type="Item" id="ItemResult">
+        <result property="orderId"  column="order_id"   />
+        <result property="itemId"    column="item_id"    />
+        <result property="itemHandle"    column="item_handle"    />
+        <result property="itemMenuId"    column="item_menu_id"    />
+        <result property="itemAmount"    column="item_amount"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="totalPrice"  column="total_price"  />
+        <result property="itemState"    column="item_state"    />
+    </resultMap>
+
+    <resultMap id="ItemVOResult" type="ItemVO"  extends="ItemResult">
+        <result property="menu" column="menu_name"  />
+    </resultMap>
+
+    <sql id="selectItemVo">
+        select order_id, item_id, item_handle, item_menu_id, item_amount, unit_price, total_price, item_state, menu_name
+        from sales_item i join menu m
+        on i.item_menu_id = m.menu_id
+    </sql>
+
+    <select id="selectItemList" parameterType="Item" resultMap="ItemVOResult">
+        <include refid="selectItemVo"/>
+        <where>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="itemId != null "> and item_id = #{itemId}</if>
+            <if test="itemHandle != null  and itemHandle != '' "> and item_handle = #{itemHandle}</if>
+            <if test="itemMenuId != null "> and item_menu_id = #{itemMenuId}</if>
+            <if test="itemAmount != null "> and item_amount = #{itemAmount}</if>
+            <if test="unitPrice != null "> and unit_price = #{unitPrice}</if>
+            <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
+            <if test="itemState != null "> and item_state = #{itemState}</if>
+        </where>
+    </select>
+
+    <select id="selectItemById" parameterType="Integer" resultMap="ItemVOResult">
+        <include refid="selectItemVo"/>
+        where item_id = #{itemId}
+    </select>
+
+    <insert id="insertItem" parameterType="Item">
+        insert into sales_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null  ">order_id,</if>
+            <if test="itemId != null  ">item_id,</if>
+            <if test="itemHandle != null  and itemHandle != ''  ">item_handle,</if>
+            <if test="itemMenuId != null  ">item_menu_id,</if>
+            <if test="itemAmount != null  ">item_amount,</if>
+            <if test="unitPrice != null  ">unit_price,</if>
+            <if test="totalPrice != null  ">total_price,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null  ">#{orderId},</if>
+            <if test="itemId != null  ">#{itemId},</if>
+            <if test="itemHandle != null  and itemHandle != ''  ">#{itemHandle},</if>
+            <if test="itemMenuId != null  ">#{itemMenuId},</if>
+            <if test="itemAmount != null  ">#{itemAmount},</if>
+            <if test="unitPrice != null  ">#{unitPrice},</if>
+            <if test="totalPrice != null  ">#{totalPrice},</if>
+        </trim>
+    </insert>
+
+    <update id="updateItem" parameterType="Item">
+        update sales_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="itemHandle != null  and itemHandle != ''  ">item_handle = #{itemHandle},</if>
+            <if test="itemMenuId != null  ">item_menu_id = #{itemMenuId},</if>
+            <if test="itemAmount != null  ">item_amount = #{itemAmount},</if>
+            <if test="unitPrice != null  ">unit_price = #{unitPrice},</if>
+            <if test="totalPrice != null  ">total_price = #{totalPrice},</if>
+            <if test="itemState != null  ">item_state = #{itemState},</if>
+        </trim>
+        where item_id = #{itemId}
+    </update>
+
+    <delete id="deleteItemById" parameterType="Integer">
+        delete from sales_item where item_id = #{itemId}
+    </delete>
+
+    <delete id="deleteItemByIds" parameterType="Integer">
+        delete from sales_item where item_id in
+        <foreach item="itemId" collection="array" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </delete>
+
+</mapper>

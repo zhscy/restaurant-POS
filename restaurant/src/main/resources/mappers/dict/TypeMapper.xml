@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.dictionary.mapper.TypeMapper">
+    
+    <resultMap type="Type" id="TypeResult">
+        <result property="dictId"    column="dict_id"    />
+        <result property="dictName"    column="dict_name"    />
+        <result property="dictType"    column="dict_type"    />
+        <result property="dictRemark"    column="dict_remark"    />
+    </resultMap>
+	
+	<sql id="selectTypeVo">
+        select dict_id, dict_name, dict_type, dict_remark from dict_type
+    </sql>
+	
+    <select id="selectTypeList" parameterType="Type" resultMap="TypeResult">
+        <include refid="selectTypeVo"/>
+        <where>  
+            <if test="dictId != null "> and dict_id = #{dictId}</if>
+             <if test="dictName != null  and dictName != '' "> and dict_name = #{dictName}</if>
+             <if test="dictType != null  and dictType != '' "> and dict_type = #{dictType}</if>
+             <if test="dictRemark != null  and dictRemark != '' "> and dict_remark = #{dictRemark}</if>
+         </where>
+    </select>
+    
+    <select id="selectTypeById" parameterType="Integer" resultMap="TypeResult">
+        <include refid="selectTypeVo"/>
+        where dict_id = #{dictId}
+    </select>
+        
+    <insert id="insertType" parameterType="Type">
+        insert into dict_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dictId != null  ">dict_id,</if>
+			<if test="dictName != null  and dictName != ''  ">dict_name,</if>
+			<if test="dictType != null  and dictType != ''  ">dict_type,</if>
+			<if test="dictRemark != null  and dictRemark != ''  ">dict_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dictId != null  ">#{dictId},</if>
+			<if test="dictName != null  and dictName != ''  ">#{dictName},</if>
+			<if test="dictType != null  and dictType != ''  ">#{dictType},</if>
+			<if test="dictRemark != null  and dictRemark != ''  ">#{dictRemark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateType" parameterType="Type">
+        update dict_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dictName != null  and dictName != ''  ">dict_name = #{dictName},</if>
+            <if test="dictType != null  and dictType != ''  ">dict_type = #{dictType},</if>
+            <if test="dictRemark != null  ">dict_remark = #{dictRemark},</if>
+        </trim>
+        where dict_id = #{dictId}
+    </update>
+
+	<delete id="deleteTypeById" parameterType="Integer">
+        delete from dict_type where dict_id = #{dictId}
+    </delete>
+	
+    <delete id="deleteTypeByIds" parameterType="Integer">
+        delete from dict_type where dict_id in 
+        <foreach item="dictId" collection="array" open="(" separator="," close=")">
+            #{dictId}
+        </foreach>
+    </delete>
+    
+</mapper>

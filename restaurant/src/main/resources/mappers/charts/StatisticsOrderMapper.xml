@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.charts.mapper.StatisticsOrderMapper">
+
+    <resultMap type="StatisticsOrder" id="StatisticOrderByYearResult">
+        <result property="name" column="s_month"/>
+        <result property="y" column="total"/>
+    </resultMap>
+
+    <resultMap type="StatisticsOrder" id="StatisticOrderByDayResult">
+        <result property="name" column="s_date"/>
+        <result property="y" column="total"/>
+    </resultMap>
+
+    <resultMap type="StatisticsOrder" id="StatisticCategoryResult">
+        <result property="name" column="ctg_name"/>
+        <result property="y" column="proportion"/>
+    </resultMap>
+
+    <resultMap type="StatisticsOrder" id="StatisticMenuResult">
+        <result property="name" column="menu_name"/>
+        <result property="y" column="proportion"/>
+    </resultMap>
+
+    <resultMap type="StatisticsDrilldown" id="StatisticBarCategoryResult">
+        <result property="name" column="ctg_name"/>
+        <result property="y" column="c_total"/>
+        <result property="drilldown" column="d_name"/>
+    </resultMap>
+
+    <resultMap type="StatisticsDrilldown" id="StatisticBarMenuResult">
+        <result property="name" column="ctg_name"/>
+        <result property="y" column="unit_total"/>
+        <result property="drilldown" column="m_name"/>
+    </resultMap>
+    <!--pay_state is not NULL
+                AND-->
+    <select id="statisticOrderByYear" parameterType="Integer" resultMap="StatisticOrderByYearResult">
+        SELECT
+            IF
+                ( MONTH ('order_time') = 1, 1, 1 ) AS s_month,
+                SUM( CASE WHEN MONTH (order_time) = 1 THEN order_total_price ELSE 0 END ) total
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 2, 2, 2 ),
+                SUM( CASE WHEN MONTH (order_time) = 2 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 3, 3, 3 ),
+                SUM( CASE WHEN MONTH (order_time) = 3 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 4, 4, 4 ),
+                SUM( CASE WHEN MONTH (order_time) = 4 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR ( order_time ) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 5, 5, 5 ),
+                SUM( CASE WHEN MONTH (order_time) = 5 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 6, 6, 6 ),
+                SUM( CASE WHEN MONTH (order_time) = 6 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 7, 7, 7 ),
+                SUM( CASE WHEN MONTH (order_time) = 7 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 8, 8, 8 ),
+                SUM( CASE WHEN MONTH (order_time) = 8 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 9, 9, 9 ),
+                SUM( CASE WHEN MONTH (order_time) = 9 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 10, 10, 10 ),
+                SUM( CASE WHEN MONTH (order_time) = 10 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 11, 11, 11 ),
+                SUM( CASE WHEN MONTH (order_time) = 11 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+            UNION ALL
+            SELECT
+            IF
+                ( MONTH ('order_time') = 12, 12, 12 ),
+                SUM( CASE WHEN MONTH (order_time) = 12 THEN order_total_price ELSE 0 END )
+            FROM
+                sales_order
+            WHERE
+                 YEAR (order_time) = #{year}
+    </select>
+
+    <select id="statisticOrderByDay" parameterType="Integer" resultMap="StatisticOrderByDayResult">
+        SELECT date_format( order_time, '%Y-%m-%d' ) s_date, sum( order_total_price) total FROM sales_order
+        WHERE DATEDIFF(order_time,NOW()) &lt;= 0 AND DATEDIFF(order_time,NOW())  &gt;= -#{day}
+        GROUP BY s_date
+    </select>
+
+
+<!--    <select id="StatisticOrderByDayAnother" parameterType="Integer" resultMap="StatisticOrderByDayResult">
+        SELECT date_format(order_time, '%Y-%m-%d' ) s_date, sum( order_total_price) total
+        FROM sales_order where DATE_SUB(CURDATE(), INTERVAL -#{day} DAY) <= date(order_time)
+        GROUP BY s_date
+    </select>-->
+    
+    <select id="statisticCategory" parameterType="date" resultMap="StatisticCategoryResult">
+        SELECT ctg_name, CONCAT(ROUND(a.unit_total / b.total * 100, 2)) proportion
+        FROM
+        (select sum(total_price) unit_total, ctg_name
+        from sales_item i join menu m join sales_order o join category c
+        WHERE i.item_menu_id = m.menu_id
+        AND i.order_id = o.order_id
+        AND m.menu_category = c.ctg_id
+        <if test="startTime != null "> and date_format(o.order_time,'%Y%m%d') &gt;= date_format(#{startTime},'%Y%m%d')</if>
+        <if test="endTime != null "> and  date_format(o.order_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')</if>
+        GROUP BY ctg_name) a,
+        (SELECT sum(order_total_price) total from sales_order
+        <where>
+            <if test="startTime != null "> and date_format(order_time,'%Y%m%d') &gt;= date_format(#{startTime},'%Y%m%d')</if>
+            <if test="endTime != null "> and  date_format(order_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')</if>
+        </where>
+        ) b
+    </select>
+
+    <select id="statisticsMenu" resultMap="StatisticMenuResult">
+        SELECT menu_name, CONCAT(ROUND(a.unit_total / b.total * 100, 2)) proportion
+        FROM
+        (select sum(total_price) unit_total, menu_name
+        from sales_item i join menu m join sales_order o
+        on i.item_menu_id = m.menu_id
+        AND i.order_id = o.order_id
+        AND m.menu_category = #{categoryId}
+        <if test="startTime != null "> and date_format(o.order_time,'%Y%m%d') &gt;= date_format(#{startTime},'%Y%m%d')</if>
+        <if test="endTime != null "> and  date_format(o.order_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')</if>
+        GROUP BY menu_name) a,
+        (SELECT sum(total_price) total from sales_item i
+        JOIN menu m JOIN sales_order o
+        WHERE i.item_menu_id = m.menu_id
+        AND i.order_id = o.order_id
+        AND m.menu_category = #{categoryId}
+        <if test="startTime != null "> and date_format(o.order_time,'%Y%m%d') &gt;= date_format(#{startTime},'%Y%m%d')</if>
+        <if test="endTime != null "> and  date_format(o.order_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')</if>
+        ) b
+    </select>
+
+    <select id="statisticsBarCategory" parameterType="date" resultMap="StatisticBarCategoryResult">
+        select ctg_name, sum(total_price) c_total, ctg_name d_name
+        from sales_item i join menu m join sales_order o join category c
+        on i.item_menu_id = m.menu_id
+        AND i.order_id = o.order_id
+        AND m.menu_category = c.ctg_id
+        <if test="startTime != null "> and date_format(o.order_time,'%Y%m%d') &gt;= date_format(#{startTime},'%Y%m%d')</if>
+        <if test="endTime != null "> and  date_format(o.order_time,'%Y%m%d') &lt;= date_format(#{endTime},'%Y%m%d')</if>
+        GROUP BY ctg_name
+        ORDER BY ctg_name
+    </select>
+
+    <select id="statisticsBarMenu" resultMap="StatisticBarMenuResult">
+        SELECT ctg_name, a.menu_name m_name, unit_total FROM
+        (select sum(total_price) unit_total, menu_name
+        from sales_item i join menu m join sales_order o
+        on i.item_menu_id = m.menu_id
+        AND i.order_id = o.order_id
+        GROUP BY menu_name) a,
+        (select menu_name, ctg_name from menu m join category c
+        on m.menu_category = c.ctg_id) b
+        WHERE a.menu_name = b.menu_name
+        ORDER BY ctg_name
+
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="renderer" content="webkit|ie-comp|ie-stand">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+        <meta http-equiv="Cache-Control" content="no-siteapp" />
+        <!--[if lt IE 9]>
+        <script type="text/javascript" src="lib/html5shiv.js"></script>
+        <script type="text/javascript" src="lib/respond.min.js"></script>
+        <![endif]-->
+        <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui/css/H-ui.min.css}" />
+        <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/H-ui.admin.css}" />
+        <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+        <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/skin/default/skin.css}" id="skin" />
+        <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/style.css}" />
+        <!--[if IE 6]>
+        <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+        <script>DD_belatedPNG.fix('*');</script>
+        <![endif]-->
+        <title>订单管理</title>
+    </head>
+    <body>
+        <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+            <span class="c-gray en">&gt;</span>
+            系统管理
+            <span class="c-gray en">&gt;</span>
+            订单明细
+            <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+        </nav>
+        <div class="page-container">
+            <!--	<div class="text-c"> 字典名称:
+                    <input type="text" class="input-text" id="" name="" style="width:150px">
+                    表名:
+                    <span class="select-box inline">
+                    <select class="select" id="" name="">
+                        <option value="0">选择一个系统表名</option>
+                        <option value="AccountInfo">AccountInfo</option>
+                        <option value="AdminInfo">AdminInfo</option>
+                    </select>
+                    </span>
+                    字段名:
+                    <span class="select-box inline">
+                    <select class="select" id="" name="">
+                    </select>
+                    </span>
+                    <input type="hidden" id="" name="">
+                    <button type="submit" class="btn btn-primary radius" id="" name=""><i class="Hui-iconfont">&#xe600;</i> 添加字典</button>
+                </div>-->
+<!--            <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+                    <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+                    &lt;!&ndash;<a class="btn btn-primary radius" data-title="添加字典类型" data-href="" onclick="dataType_add('添加字典类型','/dictType/add')" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加字典类型</a>&ndash;&gt;
+                  <a class="btn btn-primary radius" data-title="添加菜品" data-href="" onclick="item_add('添加','450','380')" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加菜品</a>
+                </span>
+
+            </div>-->
+            <div class="mt-20">
+                <table class="table table-border table-bordered  table-bordered table-bordered table-bg table-hover table-sort">
+                    <thead>
+                        <tr class="text-c">
+                            <th width="100">订单ID</th>
+                            <th width="100">流水ID</th>
+                            <th>处理</th>
+                            <th>菜品名称</th>
+                            <th width="100">菜品单价</th>
+                            <th width="100">菜品数量</th>
+                            <th>单项总价</th>
+<!--                            <th>准备状态</th>-->
+<!--                            <th width="100">操作</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-c" th:each="item : ${items}">
+                            <td th:text="${item.orderId}"></td>
+                            <td th:text="${item.itemId}"></td>
+                            <td th:text="${item.itemHandle}"></td>
+                            <td th:text="${item.menu}"></td>
+                            <td th:text="${item.unitPrice}"></td>
+                            <td th:text="${item.itemAmount}"></td>
+                            <td th:text="${item.totalPrice}"></td>
+<!--                            <td th:text="${item.itemState == 0 ? '正在准备' : '已上菜'}"></td>-->
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--_footer 作为公共模版分离出去-->
+        <script  th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+        <script  th:src="@{/lib/layer/2.4/layer.js}"></script>
+        <script  th:src="@{/static/h-ui/js/H-ui.min.js}"></script>
+        <script  th:src="@{/static/h-ui.admin/js/H-ui.admin.js}"></script> <!--/_footer 作为公共模版分离出去-->
+
+        <!--请在下方写此页面业务相关的脚本-->
+        <script th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+        <script th:src="@{/lib/datatables/1.10.0/jquery.dataTables.min.js}"></script>
+        <script th:src="@{/lib/laypage/1.2/laypage.js}"></script>
+        <script type="text/javascript">
+            $('.table-sort').dataTable({
+                "aaSorting": [
+                    [ 1, "asc" ]
+                ],//默认第几个排序
+                "bStateSave": true,//状态保存
+                "aoColumnDefs": [
+                    //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+                    {"orderable":false,"aTargets":[2]}// 制定列不参与排序
+                ]
+            });
+            /*数据字典-添加
+            /*
+            function item_add(title,url,w,h){
+                var index = layer.open({
+                    type: 2,
+                    title: title,
+                    content: url
+                });
+                layer.full(index);
+            }
+
+
+            function item_add(title,w,h) {
+                var url = '/item/add';
+                layer_show(title, url, w, h);
+            }*/
+            /*数据字典-编辑
+            function item_edit(id){
+                var title='编辑';
+                var url='/item/edit/'+ id;
+                var w=470;
+                var h=380;
+                layer_show(title,url,w,h);
+             }*/
+            /*数据字典-删除
+            function item_del(obj,id){
+                layer.confirm('确认删除id为' + id + '的项目吗？',function(index){
+                    $.ajax({
+                        type:'POST',
+                        url: 'remove',
+                        data:{"id":id},
+                        dataType: 'json',
+                        success: function(data){
+                            if (data.code==0) {
+                                $(obj).parents("tr").remove();
+                                layer.msg(data.msg,{icon:1,time:1000});
+                            } else {
+                                layer.alert(data.msg, {icon:5});
+                            }
+                        },
+                        error:function(data) {
+                            console.log(data.msg);
+                        },
+                    });
+                });
+            }*/
+        </script>
+    </body>
+</html>

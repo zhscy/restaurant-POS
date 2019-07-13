@@ -1,0 +1,4 @@
+spring:
+  profiles: 80
+    servlet:
+    context-path: /

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.food.mapper.CategoryMapper">
+    
+    <resultMap type="Category" id="CategoryResult">
+        <result property="ctgId"    column="ctg_id"    />
+        <result property="ctgName"    column="ctg_name"    />
+        <result property="ctgRemark"    column="ctg_remark"    />
+    </resultMap>
+	
+	<sql id="selectCategoryVo">
+        select ctg_id, ctg_name, ctg_remark from category
+    </sql>
+	
+    <select id="selectCategoryList" parameterType="Category" resultMap="CategoryResult">
+        <include refid="selectCategoryVo"/>
+        <where>  
+            <if test="ctgId != null "> and ctg_id = #{ctgId}</if>
+             <if test="ctgName != null  and ctgName != '' "> and ctg_name = #{ctgName}</if>
+             <if test="ctgRemark != null  and ctgRemark != '' "> and ctg_remark = #{ctgRemark}</if>
+         </where>
+    </select>
+    
+    <select id="selectCategoryById" parameterType="Integer" resultMap="CategoryResult">
+        <include refid="selectCategoryVo"/>
+        where ctg_id = #{ctgId}
+    </select>
+        
+    <insert id="insertCategory" parameterType="Category">
+        insert into category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="ctgId != null  ">ctg_id,</if>
+			<if test="ctgName != null  and ctgName != ''  ">ctg_name,</if>
+			<if test="ctgRemark != null  and ctgRemark != ''  ">ctg_remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="ctgId != null  ">#{ctgId},</if>
+			<if test="ctgName != null  and ctgName != ''  ">#{ctgName},</if>
+			<if test="ctgRemark != null  and ctgRemark != ''  ">#{ctgRemark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCategory" parameterType="Category">
+        update category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ctgName != null  and ctgName != ''  ">ctg_name = #{ctgName},</if>
+            <!--<if test="ctgRemark != null  and ctgRemark != ''  ">ctg_remark = #{ctgRemark},</if>-->
+            <if test="ctgRemark != null">ctg_remark = #{ctgRemark},</if>
+        </trim>
+        where ctg_id = #{ctgId}
+    </update>
+
+	<delete id="deleteCategoryById" parameterType="Integer">
+        delete from category where ctg_id = #{ctgId}
+    </delete>
+	
+    <delete id="deleteCategoryByIds" parameterType="Integer">
+        delete from category where ctg_id in 
+        <foreach item="ctgId" collection="array" open="(" separator="," close=")">
+            #{ctgId}
+        </foreach>
+    </delete>
+    
+</mapper>

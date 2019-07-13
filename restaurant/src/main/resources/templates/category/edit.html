@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="Bookmark" href="/favicon.ico" >
+    <link rel="Shortcut Icon" href="/favicon.ico" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui/css/H-ui.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/H-ui.admin.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/skin/default/skin.css}" id="skin" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/style.css}" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>编辑类型 - 类型修改</title>
+</head>
+<body>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-category-edit">
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" hidden th:value="${category.ctgId}" placeholder="" id="ctgId" name="ctgId">
+                <input type="text" class="input-text" th:value="${category.ctgName}" placeholder="" id="ctgName" name="ctgName">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <!--<textarea id="dictRemark" name="dictRemark" cols="" rows="" class="textarea" th:text="${type.dictRemark}" placeholder="简单描述" dragonfly="true" onKeyUp="$.Huitextarealength(this,100)"></textarea>-->
+                <textarea id="ctgRemark" name="ctgRemark" cols="" rows="" class="textarea" th:text="${category.ctgRemark}" placeholder="简单描述" dragonfly="true" ></textarea>
+                <p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
+            </div>
+        </div>
+
+        <!--		<div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-3">备注：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" value="" placeholder="" id="dictRemark" name="dictRemark">
+                    </div>
+                </div>-->
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-success radius" id="category-edit" name="category-edit"><i class="icon-ok"></i> 修改</button>
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+<script  th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+<script  th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script  th:src="@{/static/h-ui/js/H-ui.min.js}"></script>
+<script  th:src="@{/static/h-ui.admin/js/H-ui.admin.js}"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script  th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script>
+<script  th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script>
+<script  th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script>
+<script type="text/javascript">
+    $(function(){
+        $(".permission-list dt input:checkbox").click(function(){
+            $(this).closest("dl").find("dd input:checkbox").prop("checked",$(this).prop("checked"));
+        });
+        $(".permission-list2 dd input:checkbox").click(function(){
+            var l =$(this).parent().parent().find("input:checked").length;
+            var l2=$(this).parents(".permission-list").find(".permission-list2 dd").find("input:checked").length;
+            if($(this).prop("checked")){
+                $(this).closest("dl").find("dt input:checkbox").prop("checked",true);
+                $(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",true);
+            }
+            else{
+                if(l==0){
+                    $(this).closest("dl").find("dt input:checkbox").prop("checked",false);
+                }
+                if(l2==0){
+                    $(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",false);
+                }
+            }
+        });
+
+        $("#form-category-edit").validate({
+            rules:{
+                ctgId:{
+                    required:true,
+                },
+                ctgName:{
+                    required:true,
+                    // minlength:2,
+                    // maxlength:25
+                },
+                ctgRemark:{
+                    required:false,
+                    maxlength:100
+                }
+            },
+            onkeyup:false,
+            focusCleanup:true,
+            success:"valid",
+            submitHandler:function(form){
+                $(form).ajaxSubmit({
+                    type: 'POST',
+                    url: '/category/edit' ,
+                    async: false,
+                    success: function(data){
+                        if (data.code==0) {
+                            parent.layer.msg(data.msg, { icon: 1, time: 1000 }, function () {
+                                parent.$('.btn-refresh').click();
+                                parent.location.reload(); //刷新父页面
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            });
+                        }
+
+                        // alert(data.msg);
+                        // layer.msg(data.msg,{icon:1,time:1000});
+                        // var index = parent.layer.getFrameIndex(window.name);
+                        // parent.layer.close(index);
+                        // window.location.reload();
+                        else {
+                            layer.alert(data.msg,{icon:5});
+                        }
+                    },
+                    error: function(XmlHttpRequest, textStatus, errorThrown){
+                        layer.msg('error!',{icon:1,time:1000});
+                    }
+                });
+
+                parent.$('.btn-refresh').click();
+                // var index = parent.layer.getFrameIndex(window.name);
+                // parent.layer.close(index);
+            }
+        });
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

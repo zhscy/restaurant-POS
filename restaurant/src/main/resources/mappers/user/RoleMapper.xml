@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.user.mapper.RoleMapper">
+    
+    <resultMap type="Role" id="RoleResult">
+        <result property="roleId"    column="role_id"    />
+        <result property="roleName"    column="role_name"    />
+        <result property="roleRemark"    column="role_remark"    />
+    </resultMap>
+	
+	<sql id="selectRoleVo">
+        select role_id, role_name, role_remark from role
+    </sql>
+
+    <select id="selectRoleList" parameterType="Role" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        <where>
+            <if test="roleId != null "> and role_id = #{roleId}</if>
+            <if test="roleName != null  and roleName != '' "> and role_name = #{roleName}</if>
+            <if test="roleRemark != null  and roleRemark != '' "> and role_remark = #{roleRemark}</if>
+        </where>
+    </select>
+
+    <select id="selectRoleById" parameterType="Integer" resultMap="RoleResult">
+        <include refid="selectRoleVo"/>
+        where role_id = #{roleId}
+    </select>
+
+    <insert id="insertRole" parameterType="Role">
+        insert into role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleId != null  ">role_id,</if>
+            <if test="roleName != null  and roleName != ''  ">role_name,</if>
+            <if test="roleRemark != null  and roleRemark != ''  ">role_remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleId != null  ">#{roleId},</if>
+            <if test="roleName != null  and roleName != ''  ">#{roleName},</if>
+            <if test="roleRemark != null  and roleRemark != ''  ">#{roleRemark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateRole" parameterType="Role">
+        update role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleName != null  and roleName != ''  ">role_name = #{roleName},</if>
+            <!--<if test="ctgRemark != null  and ctgRemark != ''  ">ctg_remark = #{ctgRemark},</if>-->
+            <if test="roleRemark != null and roleRemark != ''">role_remark = #{roleRemark},</if>
+        </trim>
+        where role_id = #{roleId}
+    </update>
+
+    <delete id="deleteRoleById" parameterType="Integer">
+        delete from role where role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteRoleByIds" parameterType="Integer">
+        delete from role where role_id in
+        <foreach item="roleId" collection="array" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+</mapper>

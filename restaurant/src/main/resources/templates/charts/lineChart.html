@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui/css/H-ui.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/H-ui.admin.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/skin/default/skin.css}" id="skin" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/h-ui.admin/css/style.css}" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>折线图</title>
+    <style>
+        /* css 代码  */
+    </style>
+    <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/oldie.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 图形报表 <span class="c-gray en">&gt;</span> 折线图 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="text-c">
+        <!--<button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>-->
+        年份：
+        <input type="text" name="year" id="year" placeholder=" 年份" style="width:120px" class="input-text">
+        <button name="bt" id="bt" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+
+        最近：
+        <span class="select-box inline">
+		    <select name="day" id="day" class="select" onchange="selectDay()">
+			    <option value="">-------</option>
+			    <option value="7">近7天</option>
+                <option value="15">近15天</option>
+			    <option value="30">近30天</option>
+		    </select>
+        </span>
+    </div>
+    <div class="page-container">
+        <div id="container" style="max-width:1800px;height:500px"></div>
+    </div>
+</div>
+<!--_footer 作为公共模版分离出去-->
+<script  th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+<script  th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script  th:src="@{/static/h-ui/js/H-ui.min.js}"></script>
+<script  th:src="@{/static/h-ui.admin/js/H-ui.admin.js}"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script>
+    var chart = {}
+    getYearStatistics()
+
+
+    $(function () {
+        chart = Highcharts.chart('container', {
+            title: {
+                text: ''
+            },
+            // subtitle: {
+            //     text: '数据来源：thesolarfoundation.com'
+            // },
+            xAxis: {
+                categories: []
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    }
+                    // pointStart: 2010
+                }
+            },
+            series: [{
+                name: '',
+                data: []
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            },
+            credits:{
+                enabled: false // 禁用版权信息
+            }
+        })
+    })
+
+
+    function getYearStatistics (year) {
+        $.ajax({
+            type: 'POST',
+            url: 'postYear',
+            data: {"year": year},
+            dataType: 'json',
+            success: function (data) {
+                console.log(data)
+
+                chart.update({
+                    title: {
+                        text: data.title
+                    },
+                    xAxis: {
+                        categories: data.categories
+                    },
+                    yAxis: {
+                        title: {
+                            text: data.ytext
+                        }
+                    },
+                    series: [{
+                        name: data.seriesName,
+                        data: data.seriesData
+                    }]
+                })
+
+            },
+            error: function (data) {
+                console.log('error')
+                layer.alert('发生错误!', {icon: 2, time: 1000});
+            }
+        })
+    }
+
+    function selectDay() {
+        var day = $('#day').val();
+        if (day != null && day != '') {
+            console.log('day' + day)
+
+            $.ajax({
+                type: 'POST',
+                url: 'postDay',
+                data: {"day": day},
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+
+                    chart.update({
+                        title: {
+                            text: data.title
+                        },
+                        xAxis: {
+                            categories: data.categories
+                        },
+                        yAxis: {
+                            title: {
+                                text: data.ytext
+                            }
+                        },
+                        series: [{
+                            name: data.seriesName,
+                            data: data.seriesData
+                        }]
+                    })
+                },
+                error: function (data) {
+                    console.log('error')
+                    layer.alert('发生错误!', {icon: 2, time: 1000});
+                }
+            })
+        }
+    }
+
+    $("#bt").click(function () {
+        var year = $('#year').val()
+        // console.log("year=" + year)
+        getYearStatistics (year)
+    })
+</script>
+</body>
+</html>

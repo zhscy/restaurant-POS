@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.order.mapper.TableMapper">
+    
+    <resultMap type="Table" id="TableResult">
+        <result property="dinnerId"    column="dinner_id"    />
+        <result property="dinnerNumber"    column="dinner_Number"    />
+        <result property="dinnerType"    column="dinner_Type"    />
+        <result property="tableState"  column="table_state"  />
+    </resultMap>
+	
+	<sql id="selectTableVo">
+        select dinner_id, dinner_number, dinner_type, table_state from dinner_table
+    </sql>
+	
+    <select id="selectTableList" parameterType="Table" resultMap="TableResult">
+        <include refid="selectTableVo"/>
+        <where>  
+            <if test="dinnerId != null "> and dinner_id = #{dinnerId}</if>
+             <if test="dinnerNumber != null "> and dinner_number = #{dinnerNumber}</if>
+             <if test="dinnerType != null  and dinnerType != '' "> and dinner_type = #{dinnerType}</if>
+             <if test="tableState != null  "> and table_state = #{tableState}</if>
+         </where>
+    </select>
+    
+    <select id="selectTableById" parameterType="Integer" resultMap="TableResult">
+        <include refid="selectTableVo"/>
+        where dinner_id = #{dinnerId}
+    </select>
+        
+    <insert id="insertTable" parameterType="Table">
+        insert into dinner_table
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dinnerId != null  ">dinner_id,</if>
+            <if test="dinnerNumber != null  ">dinner_number,</if>
+			<if test="dinnerType != null  and dinnerType != ''  ">dinner_type,</if>
+			<if test="tableState != null  ">table_state,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dinnerId != null  ">#{dinnerId},</if>
+            <if test="dinnerNumber != null  ">#{dinnerNumber},</if>
+			<if test="dinnerType != null  and dinnerType != ''  ">#{dinnerType},</if>
+			<if test="tableState != null  ">#{tableState},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTable" parameterType="Table">
+        update dinner_table
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dinnerNumber != null">dinner_number = #{dinnerNumber},</if>
+            <if test="dinnerType != null  and dinnerType != ''  ">dinner_type = #{dinnerType},</if>
+            <!--<if test="tableVaild != null  and tableVaild != ''  ">table_Vaild = #{tableVaild},</if>-->
+            <if test="tableState != null">table_state = #{tableState},</if>
+        </trim>
+        where dinner_id = #{dinnerId}
+    </update>
+
+	<delete id="deleteTableById" parameterType="Integer">
+        delete from dinner_table where dinner_id = #{dinnerId}
+    </delete>
+	
+    <delete id="deleteTableByIds" parameterType="Integer">
+        delete from dinner_table where dinner_id in
+        <foreach item="dinnerId" collection="array" open="(" separator="," close=")">
+            #{dinnerId}
+        </foreach>
+    </delete>
+    
+</mapper>

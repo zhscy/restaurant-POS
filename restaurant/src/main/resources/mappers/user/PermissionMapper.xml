@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.user.mapper.PermissionMapper">
+
+    <resultMap type="Permission" id="PermissionResult">
+        <result property="permsId" column="perms_id" />
+        <result property="roleName"    column="role_name"    />
+        <result property="rolePermission"    column="role_permission"    />
+    </resultMap>
+
+    <sql id="selectPermissionVo">
+        select perms_id, role_name, role_permission from permission
+    </sql>
+
+
+    <select id="selectPermissionById" parameterType="Integer" resultMap="PermissionResult">
+        <include refid="selectPermissionVo"/>
+        where perms_id = #{permsId}
+    </select>
+
+    <select id="selectPermissionList" parameterType="Permission" resultMap="PermissionResult">
+        <include refid="selectPermissionVo"/>
+        <where>
+            <if test="roleName != null  and roleName != '' "> and role_name = #{roleName}</if>
+            <if test="rolePermission != null  and rolePermission != '' "> and role_permission = #{rolePermission}</if>
+        </where>
+    </select>
+
+    <select id="selectPermissionByRole" parameterType="String" resultType="String">
+        select role_permission from permission
+        where role_name = #{roleName}
+    </select>
+
+    <insert id="insertPerms" parameterType="Permission">
+        insert into permission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null  and roleName != ''  ">role_name,</if>
+            <if test="rolePermission != null  and rolePermission != ''  ">role_permission,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null  and roleName != ''  ">#{roleName},</if>
+            <if test="rolePermission != null  and rolePermission != ''  ">#{rolePermission},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePerms" parameterType="Permission">
+        update permission
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleName != null  and roleName != ''  ">role_name = #{roleName},</if>
+            <if test="rolePermission != null  and rolePermission != ''  ">role_permission = #{rolePermission},</if>
+        </trim>
+        where perms_id = #{permsId}
+    </update>
+
+    <delete id="deletePerms" parameterType="Integer">
+        delete from permission where perms_id = #{permsId}
+    </delete>
+
+    <delete id="deletePermsByIds" parameterType="Integer">
+        delete from permission where perms_id in
+        <foreach item="permsId" collection="array" open="(" separator="," close=")">
+            #{permsId}
+        </foreach>
+    </delete>
+
+
+</mapper>

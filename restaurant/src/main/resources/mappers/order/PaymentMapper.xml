@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.order.mapper.PaymentMapper">
+    
+    <resultMap type="Payment" id="PaymentResult">
+        <result property="payId"    column="pay_id"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="payWay"    column="pay_way"    />
+        <result property="payTotal"    column="pay_total"    />
+        <result property="payActual"    column="pay_actual"    />
+        <result property="payChange"    column="pay_change"    />
+    </resultMap>
+	
+	<sql id="selectPaymentVo">
+        select pay_id, pay_time, pay_way, pay_total, pay_actual, pay_change from payment
+    </sql>
+
+    <select id="selectPaymentList" parameterType="Payment" resultMap="PaymentResult">
+        <include refid="selectPaymentVo"/>
+        <where>
+            <if test="payId != null "> and pay_id = #{payId}</if>
+            <if test="payTime != null "> and pay_time = #{payTime}</if>
+            <if test="payWay != null  "> and pay_way = #{payWay}</if>
+            <if test="payTotal != null  "> and pay_total = #{payTotal}</if>
+            <if test="payActual != null  "> and pay_actual = #{payActual}</if>
+            <if test="payChange != null  "> and pay_change = #{payChange}</if>
+        </where>
+    </select>
+
+    <select id="selectPaymentById" parameterType="Integer" resultMap="PaymentResult">
+        <include refid="selectPaymentVo"/>
+        where pay_id = #{payId}
+    </select>
+
+    <insert id="insertPayment" parameterType="Payment" useGeneratedKeys="true" keyProperty="payId">
+        insert into payment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="payId != null ">pay_id,</if>
+            <if test="payTime != null ">pay_time,</if>
+            <if test="payWay != null">pay_way,</if>
+            <if test="payTotal != null">pay_total,</if>
+            <if test="payActual != null">pay_actual,</if>
+            <if test="payChange != null">pay_change,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="payId != null  ">#{payId},</if>
+            <if test="payTime != null">#{payTime},</if>
+            <if test="payWay != null ">#{payWay},</if>
+            <if test="payTotal != null ">#{payTotal},</if>
+            <if test="payActual != null ">#{payActual},</if>
+            <if test="payChange != null ">#{payChange},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePayment" parameterType="Payment">
+        update payment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="payTime != null ">pay_time = #{payTime},</if>
+            <if test="payWay != null">pay_way = #{payWay},</if>
+            <if test="payTotal != null">pay_total = #{payTotal},</if>
+            <if test="payActual != null">pay_actual = #{payActual},</if>
+            <if test="payChange != null">pay_change = #{payChange},</if>
+        </trim>
+        where pay_id = #{payId}
+    </update>
+
+</mapper>

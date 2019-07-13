@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.dictionary.mapper.DataMapper">
+
+    <resultMap type="Data" id="DataResult">
+        <result property="dictCode" column="dict_code"/>
+        <result property="dictLabel" column="dict_label"/>
+        <result property="dictValue" column="dict_value"/>
+        <result property="dictDataType" column="dict_data_type"/>
+    </resultMap>
+
+    <resultMap id="DataVOResult" type="DictDataVO" extends="DataResult">
+        <result property="dataType" column="dict_type"/>
+    </resultMap>
+
+    <sql id="selectDataVo">
+        /*select dict_code, dict_label, dict_value, dict_data_type from dict_data*/
+        select d.dict_code, d.dict_label, d.dict_value, t.dict_type
+        FROM dict_data d JOIN dict_type t
+        on d.dict_data_type = t.dict_id
+    </sql>
+
+    <select id="selectDataList" parameterType="Data" resultMap="DataVOResult">
+        <include refid="selectDataVo"/>
+        <where>
+            <if test="dictCode != null ">and dict_code = #{dictCode}</if>
+            <if test="dictLabel != null  and dictLabel != '' ">and dict_label = #{dictLabel}</if>
+            <if test="dictValue != null ">and dict_value = #{dictValue}</if>
+            <if test="dictDataType != null ">and dict_data_type = #{dictDataType}</if>
+        </where>
+    </select>
+
+    <select id="selectDataById" parameterType="Integer" resultMap="DataVOResult">
+        <include refid="selectDataVo"/>
+        where dict_code = #{dictCode}
+    </select>
+
+    <insert id="insertData" parameterType="Data">
+        insert into dict_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dictCode != null  ">dict_code,</if>
+            <if test="dictLabel != null  and dictLabel != ''  ">dict_label,</if>
+            <if test="dictValue != null  ">dict_value,</if>
+            <if test="dictDataType != null  ">dict_data_type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dictCode != null  ">#{dictCode},</if>
+            <if test="dictLabel != null  and dictLabel != ''  ">#{dictLabel},</if>
+            <if test="dictValue != null  ">#{dictValue},</if>
+            <if test="dictDataType != null  ">#{dictDataType},</if>
+        </trim>
+    </insert>
+
+    <update id="updateData" parameterType="Data">
+        update dict_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dictLabel != null  and dictLabel != ''  ">dict_label = #{dictLabel},</if>
+            <if test="dictValue != null  ">dict_value = #{dictValue},</if>
+            <if test="dictDataType != null  ">dict_data_type = #{dictDataType},</if>
+        </trim>
+        where dict_code = #{dictCode}
+    </update>
+
+    <delete id="deleteDataById" parameterType="Integer">
+        delete from dict_data where dict_code = #{dictCode}
+    </delete>
+
+    <delete id="deleteDataByIds" parameterType="Integer">
+        delete from dict_data where dict_code in
+        <foreach item="dictCode" collection="array" open="(" separator="," close=")">
+            #{dictCode}
+        </foreach>
+    </delete>
+
+</mapper>

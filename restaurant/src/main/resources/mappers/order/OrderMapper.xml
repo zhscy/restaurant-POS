@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scauxg.restaurant.order.mapper.OrderMapper">
+
+
+    <resultMap type="Order" id="OrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="orderTime"    column="order_time"    />
+        <result property="orderTotalPrice"    column="order_total_price"    />
+        <result property="tableId"    column="table_id"    />
+        <result property="payState"    column="pay_state"    />
+    </resultMap>
+
+    <resultMap id="OrderVOResult" type="OrderVO" extends="OrderResult">
+        <result property="table" column="dinner_number"  />
+        <result property="payTime" column="pay_time"  />
+        <result property="payWay" column="pay_way"  />
+        <result property="payTotal" column="pay_total"  />
+        <result property="payActual" column="pay_actual"  />
+        <result property="payChange" column="pay_change"  />
+<!--        <result property="payment" column="pay_id" />-->
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select o.order_id, o.order_time, o.order_total_price, o.table_id, o.pay_state,t.dinner_number, p.pay_time, p.pay_way, p.pay_total, p.pay_actual, p.pay_change
+        from sales_order o join dinner_table t join payment p
+        on o.table_id = t.dinner_id and o.pay_state = p.pay_id
+
+    </sql>
+
+    <sql id="selectPayOrder">
+        select o.order_id, o.order_time, o.order_total_price, o.table_id, o.pay_state, t.dinner_number
+        from sales_order o join dinner_table t
+        on o.table_id = t.dinner_id
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderVOResult">
+        <include refid="selectOrderVo"/>
+        <where>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="orderTime != null "> and order_time = #{orderTime}</if>
+            <if test="orderTotalPrice != null "> and order_total_price = #{orderTotalPrice}</if>
+            <if test="tableId != null "> and table_id = #{tableId}</if>
+            <if test="payState != null  "> and pay_state = #{payState}</if>
+        </where>
+    </select>
+
+    <select id="selectOrderById" parameterType="Integer" resultMap="OrderVOResult">
+        <include refid="selectOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <select id="selectPayOrderList" parameterType="Order" resultMap="OrderVOResult">
+        <include refid="selectPayOrder" />
+        <where>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="tableId != null "> and table_id = #{tableId}</if>
+            <if test="orderTime != null "> and order_time = #{orderTime}</if>
+            <if test="orderTotalPrice != null "> and order_total_price = #{orderTotalPrice}</if>
+             and pay_state is null
+        </where>
+    </select>
+
+    <insert id="insertOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into sales_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null  ">order_id,</if>
+            <if test="orderTime != null ">order_time,</if>
+            <if test="orderTotalPrice != null  ">order_total_price,</if>
+            <if test="tableId != null  ">table_id,</if>
+            <if test="payState != null  ">pay_state,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null  ">#{orderId},</if>
+            <if test="orderTime != null ">#{orderTime},</if>
+            <if test="orderTotalPrice != null  ">#{orderTotalPrice},</if>
+            <if test="tableId != null  ">#{tableId},</if>
+            <if test="payState != null   ">#{payState},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOrder" parameterType="Order">
+        update sales_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderTime != null ">order_time = #{orderTime},</if>
+            <if test="orderTotalPrice != null  ">order_total_price = #{orderTotalPrice},</if>
+            <if test="tableId != null  ">table_id = #{tableId},</if>
+            <if test="payState != null  ">pay_state = #{payState},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+
+</mapper>
