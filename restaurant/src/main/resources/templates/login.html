@@ -34,7 +34,7 @@
 				</div>
 			</div>
 			<div class="login-center clearfix">
-<!--				<div><input type="checkbox" id="rememberMe" name="rememberMe" />记住密码</div>-->
+				<div><input type="checkbox" id="rememberMe" name="rememberMe" />记住密码</div>
 				<div class="login-center-input">
 				</div>
 			</div>
@@ -69,9 +69,9 @@
 		if(check()) {
 			/*$('#login-form').submit();*/
 
-			  var  username = $('#username').val();
-			 var  password = $('#password').val();
-			 var  rememberMe = $('#rememberMe').val();
+			var  username = $('#username').val();
+			var  password = $('#password').val();
+			var  rememberMe = $('#rememberMe').val();
 
 			$.ajax({
 				type: 'POST',

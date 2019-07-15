@@ -9,6 +9,7 @@ package com.scauxg.restaurant.shiro;
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.scauxg.restaurant.shiro.realm.CustomRealm;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -31,7 +32,8 @@ import java.util.Map;
 @Configuration
 public class ShiroConfig {
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
+//    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
@@ -59,13 +61,14 @@ public class ShiroConfig {
 //        filerMap.put("/pos/**","anon");
 
         // 拦截界面
-        filerMap.put("/*", "authc");
-        filerMap.put("/**", "authc");
-        filerMap.put("/", "authc");
-
+//        filerMap.put("/*", "authc");
+//        filerMap.put("/**", "authc");
+//        filerMap.put("/", "authc");
+        filerMap.put("/*", "user");
+        filerMap.put("/**", "user");
+        filerMap.put("/", "user");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filerMap);
-
 
         return shiroFilterFactoryBean;
     }
@@ -76,7 +79,8 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager securityManager(CustomRealm customRealm) {
+//    public DefaultWebSecurityManager securityManager(CustomRealm customRealm) {
+    public SecurityManager securityManager(CustomRealm customRealm) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(customRealm);
         // 注入缓存对象
@@ -88,7 +92,7 @@ public class ShiroConfig {
 
     @Bean
     public EhCacheManager ehCacheManager() {
-        System.out.println("ShiroConfiguration.getEhCacheManager()");
+        System.out.println("ShiroConfig --> getEhCacheManager()");
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
         return ehCacheManager;
@@ -97,7 +101,7 @@ public class ShiroConfig {
     //cookie对象;
     @Bean
     public SimpleCookie rememberMeCookie() {
-        System.out.println("ShiroConfiguration.rememberMeCookie()");
+        System.out.println("ShiroConfig --> rememberMeCookie()");
         //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
 
@@ -109,9 +113,11 @@ public class ShiroConfig {
     //cookie管理对象;
     @Bean
     public CookieRememberMeManager cookieRememberMeManager() {
-        System.out.println("ShiroConfiguration.rememberMeManager()");
+        System.out.println("ShiroConfig --> rememberMeManager()");
         CookieRememberMeManager manager = new CookieRememberMeManager();
         manager.setCookie(rememberMeCookie());
+        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
+        manager.setCipherKey(Base64.decode("4AvVhmFLUs0KTA3Kprsdag=="));
         return manager;
     }
 
