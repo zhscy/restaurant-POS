@@ -8,14 +8,17 @@ package com.scauxg.restaurant.shiro;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.scauxg.restaurant.shiro.realm.CustomRealm;
+
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,9 +34,9 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfig {
-    @Bean
 //    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
+    @Bean
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("securityManager") SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
@@ -78,18 +81,25 @@ public class ShiroConfig {
      * @param customRealm
      * @return
      */
-    @Bean
 //    public DefaultWebSecurityManager securityManager(CustomRealm customRealm) {
+    @Bean(name="securityManager")
     public SecurityManager securityManager(CustomRealm customRealm) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(customRealm);
         // 注入缓存对象
-        securityManager.setCacheManager(ehCacheManager());
+//        securityManager.setCacheManager(ehCacheManager());
         // 注入rememberMeManager
         securityManager.setRememberMeManager(cookieRememberMeManager());
         return securityManager;
     }
-
+    @Bean
+    public FormAuthenticationFilter formAuthenticationFilter(){
+        FormAuthenticationFilter formAuthenticationFilter = new FormAuthenticationFilter();
+        //对应前端的checkbox的name = rememberMe
+        formAuthenticationFilter.setRememberMeParam("rememberMe");
+        return formAuthenticationFilter;
+    }
+/*
     @Bean
     public EhCacheManager ehCacheManager() {
         System.out.println("ShiroConfig --> getEhCacheManager()");
@@ -97,6 +107,7 @@ public class ShiroConfig {
         ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
         return ehCacheManager;
     }
+*/
 
     //cookie对象;
     @Bean
@@ -135,8 +146,7 @@ public class ShiroConfig {
      * 配置ShiroDialect，用于thymeleaf和shiro标签
      */
     @Bean
-    public ShiroDialect shiroDialect()
-    {
+    public ShiroDialect shiroDialect() {
         return new ShiroDialect();
     }
 
